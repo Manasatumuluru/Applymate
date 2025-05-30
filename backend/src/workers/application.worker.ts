@@ -17,8 +17,9 @@ connectDB();
 
 async function main() {
   const worker = new Worker(
-    'application-processing',
-    async job => {
+  'application-processing',
+  async job => {
+    try {
       const { applicationId } = job.data;
       const app = await Application.findById(applicationId);
       if (!app) throw new Error('Application not found');
@@ -38,12 +39,20 @@ async function main() {
 
       await app.save();
       console.log(`✅ Processed application ${applicationId}`);
-    },
-    { connection, concurrency: 1 }
+      console.log("👀 Worker picked up job:", job.id, job.data);
+    } catch (err) {
+      console.error(`❌ Error processing job ${job.id}:`, err);
+      throw err; // Important: rethrow to let BullMQ handle retries
+    }
+  },
+  {
+    connection,
+    concurrency: 1,
+      }
   );
 
   worker.on('failed', (job, err) => {
-    console.error(`❌ Job ${job?.id} failed:`, err);
+    console.error(`🔥 Final failure after retries for job ${job?.id}:`, err);
   });
 
   console.log('🔁 Worker is running...');
@@ -52,9 +61,9 @@ async function main() {
 main().catch(err => {
   console.error('❌ Worker failed to start:', err);
 });
-
 //  Dummy HTTP listener to make Render happy
-http.createServer((_, res) => {
-  res.writeHead(200);
-  res.end('Worker running');
-}).listen(process.env.PORT || 3000);
+// http.createServer((_, res) => {
+//   res.writeHead(200);
+//   res.end('Worker running');
+// }).listen(process.env.PORT || 3000); worker.ts
+

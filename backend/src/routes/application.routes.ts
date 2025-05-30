@@ -39,7 +39,14 @@ router.post('/analyze', upload.single('resume'), async (req, res) => {
     const app = new Application({ resumeText, jobDescription });
     await app.save();
 
-    await applicationQueue.add('analyze', { applicationId: app._id });
+    await applicationQueue.add('analyze', { applicationId: app._id }, {
+    attempts: 3, // retry up to 3 times on failure
+    backoff: {
+    type: 'exponential', // could also use 'fixed'
+    delay: 3000, // wait 3 seconds before retrying
+  },
+});
+console.log("📥 Job added to queue with ID:", app._id);
     res.json({ id: app._id, status: 'queued' });
 
   } catch (error) {
