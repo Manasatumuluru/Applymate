@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ApplyMate
 
 AI-powered resume analyzer and cover letter generator for job seekers.  
@@ -60,3 +61,6 @@ Public deployment coming soon. Stay tuned.
 ## 🙌 Feedback Welcome
 
 This project is still evolving. I’d love to hear your feedback or suggestions — feel free to open an issue or connect with me on [LinkedIn](https://www.linkedin.com/in/sharukh-shaik-srk12/).
+=======
+# Applymate
+>>>>>>> 92aab06584e5512ba40e78d8246afb892717badb
